@@ -1,0 +1,21 @@
+{
+  "name": "chart",
+  "version": "1.0.0",
+  "description": "chart romm",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wendycan/chart.git"
+  },
+  "keywords": [
+    "chart"
+  ],
+  "author": "wendycan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wendycan/chart/issues"
+  },
+  "homepage": "https://github.com/wendycan/chart",
+  "dependencies": {
+    "express": "^4.10.2"
+  }
+}
