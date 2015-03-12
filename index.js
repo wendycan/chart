@@ -10,7 +10,7 @@ io.of('/chat').on('connection', function(socket){
   console.log('message: ' + 'connected');
   socket.on('chat message', function(msg){
     console.log('message: ' + msg);
-    io.of('chat').emit('display chat message', msg);
+    io.of('/chat').emit('display chat message', msg);
     // socket.broadcast.emit('display chat message', msg);
   });
   // socket.on('disconnect', function(){
@@ -18,13 +18,18 @@ io.of('/chat').on('connection', function(socket){
   // });
 });
 
-// io.of('/todos').on('connection', function(socket){
-//   console.log('message: ' + 'todos connected');
-//   socket.on('new todo', function(msg){
-//     console.log('message: ' + msg);
-//     io.emit('new todo message', msg);
-//   });
-// });
+io.of('/todos').on('connection', function(socket){
+  console.log('todos connected');
+  socket.on('todo changed', function(msg){
+    console.log('message: ' + msg);
+    io.of('/todos').emit('todo message', msg);
+  });
+
+  socket.on('add chart', function (msg) {
+    console.log('message: ' + msg);
+    io.of('/todos').emit('chart message', msg);
+  })
+});
 
 http.listen(3001, function(){
   console.log('listening on *:3001');
