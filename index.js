@@ -8,6 +8,7 @@ app.get('/', function(req, res){
 
 io.of('/chat').on('connection', function(socket){
   console.log('message: ' + 'connected');
+
   socket.on('chat message', function(msg){
     console.log('message: ' + msg);
     io.of('/chat').emit('display chat message', msg);
@@ -20,6 +21,8 @@ io.of('/chat').on('connection', function(socket){
 
 io.of('/todos').on('connection', function(socket){
   console.log('todos connected');
+  io.of('/todos').emit('join message');
+
   socket.on('todo changed', function(msg){
     console.log('message: ' + msg);
     io.of('/todos').emit('todo message', msg);
@@ -28,6 +31,11 @@ io.of('/todos').on('connection', function(socket){
   socket.on('add chart', function (msg) {
     console.log('message: ' + msg);
     io.of('/todos').emit('chart message', msg);
+  });
+
+  socket.on('disconnect', function () {
+    console.log('message: leave' );
+    io.of('/todos').emit('leave message');
   })
 });
 
