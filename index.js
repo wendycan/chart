@@ -2,6 +2,8 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var users = [];
+var usernames = [];
+
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
@@ -22,14 +24,22 @@ io.of('/chat').on('connection', function(socket){
 io.of('/todos').on('connection', function(socket){
   var cookie_string = socket.request.headers.cookie;
   var sid = cookie_string.split('=')[1];
-  var user = {sid: sid}
+  var user = {sid: sid};
 
   socket.on('join chat', function (msg) {
     console.log('todos connected');
+
     user.name = msg;
     users.push(user);
 
-    io.of('/todos').emit('join message', msg);
+    usernames.push(msg);
+
+    var data = {
+      currentUser: msg,
+      users: usernames
+    };
+
+    io.of('/todos').emit('join message', JSON.stringify(data));
   });
 
   socket.on('todo changed', function(msg){
@@ -49,7 +59,8 @@ io.of('/todos').on('connection', function(socket){
     for(var i in users) {
       if (users[i].sid == sid) {
         msg = users[i].name;
-        var a = users.splice(i);
+        users.splice(i, 1);
+        usernames.splice(i, 1);
       };
     }
     io.of('/todos').emit('leave message', msg);
