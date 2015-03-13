@@ -1,7 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
+var users = [];
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
@@ -20,8 +20,17 @@ io.of('/chat').on('connection', function(socket){
 });
 
 io.of('/todos').on('connection', function(socket){
-  console.log('todos connected');
-  io.of('/todos').emit('join message');
+  var cookie_string = socket.request.headers.cookie;
+  var sid = cookie_string.split('=')[1];
+  var user = {sid: sid}
+
+  socket.on('join chat', function (msg) {
+    console.log('todos connected');
+    user.name = msg;
+    users.push(user);
+
+    io.of('/todos').emit('join message', msg);
+  });
 
   socket.on('todo changed', function(msg){
     console.log('message: ' + msg);
@@ -33,10 +42,18 @@ io.of('/todos').on('connection', function(socket){
     io.of('/todos').emit('chart message', msg);
   });
 
-  socket.on('disconnect', function () {
+  socket.on('disconnect', function (data) {
     console.log('message: leave' );
-    io.of('/todos').emit('leave message');
-  })
+    var msg;
+
+    for(var i in users) {
+      if (users[i].sid == sid) {
+        msg = users[i].name;
+        var a = users.splice(i);
+      };
+    }
+    io.of('/todos').emit('leave message', msg);
+  });
 });
 
 http.listen(3001, function(){
