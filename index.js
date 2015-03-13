@@ -29,10 +29,14 @@ io.of('/todos').on('connection', function(socket){
   socket.on('join chat', function (msg) {
     console.log('todos connected');
 
-    user.name = msg;
-    users.push(user);
-
-    usernames.push(msg);
+    var index = usernames.indexOf(msg);
+    if (index < 0) {
+      user.name = msg;
+      users.push(user);
+      usernames.push(msg);
+    } else {
+      usernames[index].sid = sid;
+    }
 
     var data = {
       currentUser: msg,
@@ -65,6 +69,22 @@ io.of('/todos').on('connection', function(socket){
     }
     io.of('/todos').emit('leave message', msg);
   });
+
+  socket.on('leave page', function () {
+    console.log('message: leave' );
+    var msg;
+
+    for(var i in users) {
+      if (users[i].sid == sid) {
+        msg = users[i].name;
+        users.splice(i, 1);
+        usernames.splice(i, 1);
+      };
+    }
+    io.of('/todos').emit('leave message', msg);
+  });
+
+
 });
 
 http.listen(3001, function(){
