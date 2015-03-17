@@ -48,18 +48,28 @@ io.of('/todos').on('connection', function(socket){
 
   socket.on('todo changed', function(msg){
     console.log('message: ' + msg);
-    io.of('/todos').emit('todo message', msg);
+
+    var address = socket.handshake.address;
+    var data = JSON.parse(msg);
+    data.ip = address;
+
+    io.of('/todos').emit('todo message', JSON.stringify(data));
   });
 
   socket.on('add chart', function (msg) {
     console.log('message: ' + msg);
-    io.of('/todos').emit('chart message', msg);
+
+    var address = socket.handshake.address;
+    var data = JSON.parse(msg);
+    data.ip = address;
+
+    io.of('/todos').emit('chart message', JSON.stringify(data));
   });
 
   socket.on('disconnect', function (data) {
     console.log('message: leave' );
-    var msg;
 
+    var msg;
     for(var i in users) {
       if (users[i].sid == sid) {
         msg = users[i].name;
@@ -67,13 +77,14 @@ io.of('/todos').on('connection', function(socket){
         usernames.splice(i, 1);
       };
     }
+
     io.of('/todos').emit('leave message', msg);
   });
 
   socket.on('leave page', function () {
     console.log('message: leave' );
-    var msg;
 
+    var msg;
     for(var i in users) {
       if (users[i].sid == sid) {
         msg = users[i].name;
@@ -81,6 +92,7 @@ io.of('/todos').on('connection', function(socket){
         usernames.splice(i, 1);
       };
     }
+
     io.of('/todos').emit('leave message', msg);
   });
 
