@@ -12,7 +12,8 @@ app.get('/', function(req, res){
 io.set('authorization', function (handshakeData, callback) {
   // findDatabyip is an async example function
   var token = handshakeData._query.token;
-  request('http://wendycan-local.com:3000/api/v1/user?auth_token=' + token, function (error, response, body) {
+  request('http://wendycan.org/api/v1/user?auth_token=' + token, function (error, response, body) {
+  // request('http://wendycan-local.com:3000/api/v1/user?auth_token=' + token, function (error, response, body) {
     // to save to db
     if (JSON.parse(body).username) {
       console.log('success');
