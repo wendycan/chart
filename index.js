@@ -1,6 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var request = require('request');
 var users = [];
 var usernames = [];
 
@@ -8,23 +9,26 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
-io.of('/chat').on('connection', function(socket){
-  console.log('message: ' + 'connected');
-
-  socket.on('chat message', function(msg){
-    console.log('message: ' + msg);
-    io.of('/chat').emit('display chat message', msg);
-    // socket.broadcast.emit('display chat message', msg);
+io.set('authorization', function (handshakeData, callback) {
+  // findDatabyip is an async example function
+  var token = handshakeData._query.token;
+  request('http://wendycan-local.com:3000/api/v1/user?auth_token=' + token, function (error, response, body) {
+    // to save to db
+    if (JSON.parse(body).username) {
+      console.log('success');
+      callback(null, true);
+    } else {
+      console.log('failed');
+      callback(null, false);
+    }
   });
-  // socket.on('disconnect', function(){
-  //   console.log('user disconnected');
-  // });
 });
 
 io.of('/todos').on('connection', function(socket){
   var cookie_string = socket.request.headers.cookie;
   var sid = cookie_string.split('=')[1];
   var user = {sid: sid};
+
 
   socket.on('join chat', function (msg) {
     console.log('todos connected');
@@ -47,8 +51,6 @@ io.of('/todos').on('connection', function(socket){
   });
 
   socket.on('todo changed', function(msg){
-    console.log('message: ' + msg);
-
     var address = socket.handshake.address;
     var data = JSON.parse(msg);
     data.ip = address;
@@ -57,8 +59,6 @@ io.of('/todos').on('connection', function(socket){
   });
 
   socket.on('add chart', function (msg) {
-    console.log('message: ' + msg);
-
     var address = socket.handshake.address;
     var data = JSON.parse(msg);
     data.ip = address;
@@ -96,9 +96,8 @@ io.of('/todos').on('connection', function(socket){
     io.of('/todos').emit('leave message', msg);
   });
 
-
 });
 
 http.listen(3001, function(){
-  console.log('listening on *:3001');
+console.log('listening on *:3001');
 });
