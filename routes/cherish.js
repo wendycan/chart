@@ -17,7 +17,7 @@ io.set('authorization', function (handshakeData, callback) {
   // findDatabyip is an async example function
 
   var token = handshakeData._query.token;
-  request('http://wendycan.org/api/v1/user?auth_token=' + token, function (error, response, body) {
+  request('http://wendy.larklearning.com/api/v1/user?auth_token=' + token, function (error, response, body) {
   // request('http://wendycan-local.com:3003/api/v1/user?auth_token=' + token, function (error, response, body) { //Rails use 3003!!!
     // to save to db
     if (JSON.parse(body).username) {
